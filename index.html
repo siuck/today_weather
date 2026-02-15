@@ -33,48 +33,6 @@
             margin-bottom: 20px;
         }
 
-        .current-weather-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
-            padding: 20px;
-            background: #16213e;
-            border-radius: 15px;
-            border: 1px solid #1a5490;
-        }
-
-        .current-icon {
-            font-size: 5em;
-        }
-
-        .current-details {
-            text-align: left;
-        }
-
-        .current-weather {
-            text-align: center;
-        }
-
-        .current-temp {
-            font-size: 3em;
-            color: #e94560;
-            font-weight: bold;
-            line-height: 1;
-        }
-
-        .current-condition {
-            font-size: 1.3em;
-            color: #a8b2d1;
-            margin-top: 5px;
-        }
-
-        .current-updated {
-            color: #a8b2d1;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
         .section-title {
             color: #e94560;
             font-size: 1.5em;
@@ -204,49 +162,6 @@
             font-weight: bold;
         }
 
-        .chart-container {
-            display: grid;
-            gap: 15px;
-        }
-
-        .day-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: #16213e;
-            border-radius: 10px;
-            transition: transform 0.2s, background 0.2s;
-            border: 1px solid #1a5490;
-        }
-
-        .day-item:hover {
-            transform: translateX(5px);
-            background: #1a5490;
-        }
-
-        .day-name {
-            font-weight: bold;
-            color: #e94560;
-            min-width: 100px;
-        }
-
-        .day-date {
-            color: #a8b2d1;
-            font-size: 0.9em;
-        }
-
-        .day-temp {
-            font-size: 1.3em;
-            color: #00d9ff;
-            font-weight: bold;
-        }
-
-        .day-rain {
-            color: #00d9ff;
-            font-size: 0.9em;
-        }
-
         .map-container {
             background: #16213e;
             padding: 20px;
@@ -256,62 +171,35 @@
 
         #weatherMap {
             width: 100%;
-            height: 100%;
-            border: 0;
+            height: 450px;
             border-radius: 10px;
         }
 
-        .weather-icon {
-            font-size: 3em;
-            margin: 20px 0;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #a8b2d1;
+            font-size: 1.2em;
         }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .tab-button {
-            background: #0f3460;
+        .error {
+            text-align: center;
+            padding: 40px;
             color: #e94560;
-            border: 2px solid #e94560;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
+            font-size: 1.1em;
         }
 
-        .tab-button.active {
-            background: linear-gradient(135deg, #e94560 0%, #d63447 100%);
-            color: white;
-            border-color: transparent;
-        }
-
-        .tab-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
-            background: #1a5490;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
+        .last-updated {
+            text-align: center;
+            color: #a8b2d1;
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-style: italic;
         }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .current-temp {
-                font-size: 3em;
+            .section-title {
+                font-size: 1.2em;
             }
         }
     </style>
@@ -320,148 +208,30 @@
     <div class="container">
         <!-- 15-Day Weather Timeline -->
         <div class="weather-section">
-            <div class="section-title">🌤️ Ladue, MO - 15-Day Weather Timeline for CK</div>
-            <div class="timeline-labels">
-                <span class="timeline-label past">← Past 7 Days</span>
-                <span class="timeline-label today">Today</span>
-                <span class="timeline-label future">Next 7 Days →</span>
+            <div class="section-title">🌤️ Ladue, MO - 15-Day Weather Timeline (Live Data)</div>
+            
+            <div id="loadingMessage" class="loading">
+                Loading live weather data...
             </div>
-            <div class="chart-container-wide">
-                <svg class="line-chart" viewBox="0 0 1000 300" preserveAspectRatio="none">
-                    <!-- Grid lines -->
-                    <line x1="0" y1="75" x2="1000" y2="75" stroke="#1a5490" stroke-width="1" opacity="0.3"/>
-                    <line x1="0" y1="150" x2="1000" y2="150" stroke="#1a5490" stroke-width="1" opacity="0.3"/>
-                    <line x1="0" y1="225" x2="1000" y2="225" stroke="#1a5490" stroke-width="1" opacity="0.3"/>
+
+            <div id="errorMessage" class="error" style="display: none;">
+                Unable to load weather data. Please try again later.
+            </div>
+
+            <div id="weatherChart" style="display: none;">
+                <div class="timeline-labels">
+                    <span class="timeline-label past">← Past 7 Days</span>
+                    <span class="timeline-label today">Today</span>
+                    <span class="timeline-label future">Next 7 Days →</span>
+                </div>
+                <div class="chart-container-wide">
+                    <svg class="line-chart" id="weatherSvg" viewBox="0 0 1000 300" preserveAspectRatio="none">
+                    </svg>
                     
-                    <!-- Area fill under the line -->
-                    <path d="M 33 144 L 100 156 L 167 165 L 234 171 L 301 159 L 368 150 L 435 162 L 500 159 L 567 132 L 634 105 L 701 111 L 768 93 L 835 99 L 902 117 L 967 126 L 967 300 L 33 300 Z" 
-                          fill="url(#gradient)" opacity="0.3"/>
-                    
-                    <!-- Temperature line -->
-                    <path d="M 33 144 L 100 156 L 167 165 L 234 171 L 301 159 L 368 150 L 435 162 L 500 159 L 567 132 L 634 105 L 701 111 L 768 93 L 835 99 L 902 117 L 967 126" 
-                          stroke="url(#lineGradient)" 
-                          stroke-width="3" 
-                          fill="none"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"/>
-                    
-                    <!-- Data points -->
-                    <circle cx="33" cy="144" r="5" fill="#4a5568" class="data-point past-point"/>
-                    <circle cx="100" cy="156" r="5" fill="#4a90e2" class="data-point past-point"/>
-                    <circle cx="167" cy="165" r="5" fill="#4a90e2" class="data-point past-point"/>
-                    <circle cx="234" cy="171" r="5" fill="#4a5568" class="data-point past-point"/>
-                    <circle cx="301" cy="159" r="5" fill="#6b7280" class="data-point past-point"/>
-                    <circle cx="368" cy="150" r="5" fill="#00d9ff" class="data-point past-point"/>
-                    <circle cx="435" cy="162" r="5" fill="#4a5568" class="data-point past-point"/>
-                    
-                    <!-- Current day point (highlighted) -->
-                    <circle cx="500" cy="159" r="8" fill="#e94560" class="data-point current-point"/>
-                    <circle cx="500" cy="159" r="12" fill="#e94560" opacity="0.3" class="pulse-ring"/>
-                    
-                    <!-- Future points -->
-                    <circle cx="567" cy="132" r="5" fill="#00d9ff" class="data-point future-point"/>
-                    <circle cx="634" cy="105" r="5" fill="#ffd700" class="data-point future-point"/>
-                    <circle cx="701" cy="111" r="5" fill="#ffd700" class="data-point future-point"/>
-                    <circle cx="768" cy="93" r="5" fill="#ff8c00" class="data-point future-point"/>
-                    <circle cx="835" cy="99" r="5" fill="#ffd700" class="data-point future-point"/>
-                    <circle cx="902" cy="117" r="5" fill="#00d9ff" class="data-point future-point"/>
-                    <circle cx="967" cy="126" r="5" fill="#00d9ff" class="data-point future-point"/>
-                    
-                    <!-- Gradient definitions -->
-                    <defs>
-                        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:#e94560;stop-opacity:0.4" />
-                            <stop offset="100%" style="stop-color:#00d9ff;stop-opacity:0.1" />
-                        </linearGradient>
-                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:#4a5568" />
-                            <stop offset="46%" style="stop-color:#00d9ff" />
-                            <stop offset="50%" style="stop-color:#e94560" />
-                            <stop offset="54%" style="stop-color:#00d9ff" />
-                            <stop offset="80%" style="stop-color:#ffd700" />
-                            <stop offset="100%" style="stop-color:#00d9ff" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-                
-                <!-- Day labels below the chart -->
-                <div class="chart-labels">
-                    <div class="day-label past-label">
-                        <div class="label-temp">52°F</div>
-                        <div class="label-day">Sat<br>Feb 7</div>
-                        <div class="label-icon">☁️</div>
-                    </div>
-                    <div class="day-label past-label">
-                        <div class="label-temp">48°F</div>
-                        <div class="label-day">Sun<br>Feb 8</div>
-                        <div class="label-icon">🌧️</div>
-                    </div>
-                    <div class="day-label past-label">
-                        <div class="label-temp">45°F</div>
-                        <div class="label-day">Mon<br>Feb 9</div>
-                        <div class="label-icon">🌧️</div>
-                    </div>
-                    <div class="day-label past-label">
-                        <div class="label-temp">43°F</div>
-                        <div class="label-day">Tue<br>Feb 10</div>
-                        <div class="label-icon">☁️</div>
-                    </div>
-                    <div class="day-label past-label">
-                        <div class="label-temp">47°F</div>
-                        <div class="label-day">Wed<br>Feb 11</div>
-                        <div class="label-icon">⛅</div>
-                    </div>
-                    <div class="day-label past-label">
-                        <div class="label-temp">50°F</div>
-                        <div class="label-day">Thu<br>Feb 12</div>
-                        <div class="label-icon">☀️</div>
-                    </div>
-                    <div class="day-label past-label">
-                        <div class="label-temp">44°F</div>
-                        <div class="label-day">Fri<br>Feb 13</div>
-                        <div class="label-icon">☁️</div>
-                    </div>
-                    <div class="day-label current-label">
-                        <div class="label-temp">46.5°F</div>
-                        <div class="label-day"><strong>TODAY</strong><br>Feb 14</div>
-                        <div class="label-icon">🌧️ 99%</div>
-                    </div>
-                    <div class="day-label future-label">
-                        <div class="label-temp">56°F</div>
-                        <div class="label-day">Sun<br>Feb 15</div>
-                        <div class="label-icon">⛅ 5%</div>
-                    </div>
-                    <div class="day-label future-label">
-                        <div class="label-temp">65°F</div>
-                        <div class="label-day">Mon<br>Feb 16</div>
-                        <div class="label-icon">☀️ 10%</div>
-                    </div>
-                    <div class="day-label future-label">
-                        <div class="label-temp">63°F</div>
-                        <div class="label-day">Tue<br>Feb 17</div>
-                        <div class="label-icon">☀️ 10%</div>
-                    </div>
-                    <div class="day-label future-label">
-                        <div class="label-temp">69°F</div>
-                        <div class="label-day">Wed<br>Feb 18</div>
-                        <div class="label-icon">☀️ 0%</div>
-                    </div>
-                    <div class="day-label future-label">
-                        <div class="label-temp">67°F</div>
-                        <div class="label-day">Thu<br>Feb 19</div>
-                        <div class="label-icon">⛅ 15%</div>
-                    </div>
-                    <div class="day-label future-label">
-                        <div class="label-temp">62°F</div>
-                        <div class="label-day">Fri<br>Feb 20</div>
-                        <div class="label-icon">☁️ 30%</div>
-                    </div>
-                    <div class="day-label future-label">
-                        <div class="label-temp">58°F</div>
-                        <div class="label-day">Sat<br>Feb 21</div>
-                        <div class="label-icon">⛅ 20%</div>
+                    <div class="chart-labels" id="chartLabels">
                     </div>
                 </div>
+                <div class="last-updated" id="lastUpdated"></div>
             </div>
         </div>
 
@@ -469,7 +239,7 @@
         <div class="weather-section">
             <div class="section-title">📍 Ladue, MO - Precipitation Map</div>
             <div class="map-container">
-                <div id="weatherMap" style="width: 100%; height: 450px; border-radius: 10px;"></div>
+                <div id="weatherMap"></div>
                 <div style="margin-top: 10px; color: #a8b2d1; font-size: 0.9em;">
                     <strong>Map Legend:</strong> Blue overlay shows precipitation. Click to zoom/pan.
                 </div>
@@ -479,58 +249,337 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Initialize map on page load
-        window.addEventListener('load', function() {
-            setTimeout(initializeMap, 500);
-        });
+        // Ladue, MO coordinates
+        const LATITUDE = 38.6495;
+        const LONGITUDE = -90.3784;
 
+        let weatherData = null;
+        let weatherMap = null;
+
+        // Fetch weather data from Open-Meteo API
+        async function fetchWeatherData() {
+            try {
+                // Get current date
+                const today = new Date();
+                const past7Days = new Date(today);
+                past7Days.setDate(past7Days.getDate() - 7);
+
+                const formatDate = (date) => {
+                    return date.toISOString().split('T')[0];
+                };
+
+                // Fetch historical and forecast data
+                const historicalResponse = await fetch(
+                    `https://archive-api.open-meteo.com/v1/archive?latitude=${LATITUDE}&longitude=${LONGITUDE}&start_date=${formatDate(past7Days)}&end_date=${formatDate(today)}&daily=temperature_2m_max,precipitation_probability_max,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago`
+                );
+
+                const forecastResponse = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${LATITUDE}&longitude=${LONGITUDE}&daily=temperature_2m_max,precipitation_probability_max,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago&forecast_days=8`
+                );
+
+                if (!historicalResponse.ok || !forecastResponse.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const historicalData = await historicalResponse.json();
+                const forecastData = await forecastResponse.json();
+
+                // Combine the data
+                const combinedData = {
+                    historical: historicalData.daily,
+                    forecast: forecastData.daily
+                };
+
+                weatherData = combinedData;
+                renderWeatherChart();
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('weatherChart').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        // Convert weather code to emoji and description
+        function getWeatherEmoji(code) {
+            const weatherCodes = {
+                0: { emoji: '☀️', desc: 'Clear' },
+                1: { emoji: '🌤️', desc: 'Mainly Clear' },
+                2: { emoji: '⛅', desc: 'Partly Cloudy' },
+                3: { emoji: '☁️', desc: 'Cloudy' },
+                45: { emoji: '🌫️', desc: 'Foggy' },
+                48: { emoji: '🌫️', desc: 'Foggy' },
+                51: { emoji: '🌦️', desc: 'Light Drizzle' },
+                53: { emoji: '🌦️', desc: 'Drizzle' },
+                55: { emoji: '🌧️', desc: 'Heavy Drizzle' },
+                61: { emoji: '🌧️', desc: 'Light Rain' },
+                63: { emoji: '🌧️', desc: 'Rain' },
+                65: { emoji: '🌧️', desc: 'Heavy Rain' },
+                71: { emoji: '🌨️', desc: 'Light Snow' },
+                73: { emoji: '🌨️', desc: 'Snow' },
+                75: { emoji: '🌨️', desc: 'Heavy Snow' },
+                77: { emoji: '🌨️', desc: 'Snow Grains' },
+                80: { emoji: '🌦️', desc: 'Light Showers' },
+                81: { emoji: '🌧️', desc: 'Showers' },
+                82: { emoji: '🌧️', desc: 'Heavy Showers' },
+                85: { emoji: '🌨️', desc: 'Light Snow Showers' },
+                86: { emoji: '🌨️', desc: 'Snow Showers' },
+                95: { emoji: '⛈️', desc: 'Thunderstorm' },
+                96: { emoji: '⛈️', desc: 'Thunderstorm with Hail' },
+                99: { emoji: '⛈️', desc: 'Severe Thunderstorm' }
+            };
+            return weatherCodes[code] || { emoji: '🌤️', desc: 'Unknown' };
+        }
+
+        function renderWeatherChart() {
+            if (!weatherData) return;
+
+            const svg = document.getElementById('weatherSvg');
+            const labelsContainer = document.getElementById('chartLabels');
+
+            // Combine all temperatures for scaling
+            const allTemps = [
+                ...weatherData.historical.temperature_2m_max.slice(-7),
+                ...weatherData.forecast.temperature_2m_max.slice(0, 8)
+            ];
+
+            const minTemp = Math.min(...allTemps);
+            const maxTemp = Math.max(...allTemps);
+            const tempRange = maxTemp - minTemp;
+
+            // Calculate Y positions (inverted for SVG)
+            const getY = (temp) => {
+                const normalized = (temp - minTemp) / tempRange;
+                return 250 - (normalized * 200); // 50px margin top/bottom
+            };
+
+            // Generate path and points
+            let pathData = '';
+            let points = [];
+            const spacing = 1000 / 14; // 15 points
+
+            allTemps.forEach((temp, index) => {
+                const x = index * spacing + spacing / 2;
+                const y = getY(temp);
+                points.push({ x, y, temp, index });
+                
+                if (index === 0) {
+                    pathData = `M ${x} ${y}`;
+                } else {
+                    pathData += ` L ${x} ${y}`;
+                }
+            });
+
+            // Clear SVG
+            svg.innerHTML = '';
+
+            // Add grid lines
+            for (let i = 0; i < 4; i++) {
+                const y = 75 * i + 25;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', '0');
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', '1000');
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', '#1a5490');
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('opacity', '0.3');
+                svg.appendChild(line);
+            }
+
+            // Add gradient definition
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            gradient.setAttribute('id', 'lineGradient');
+            gradient.setAttribute('x1', '0%');
+            gradient.setAttribute('x2', '100%');
+            
+            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop1.setAttribute('offset', '0%');
+            stop1.setAttribute('style', 'stop-color:#4a5568');
+            
+            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop2.setAttribute('offset', '46%');
+            stop2.setAttribute('style', 'stop-color:#00d9ff');
+            
+            const stop3 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop3.setAttribute('offset', '50%');
+            stop3.setAttribute('style', 'stop-color:#e94560');
+            
+            const stop4 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop4.setAttribute('offset', '54%');
+            stop4.setAttribute('style', 'stop-color:#00d9ff');
+            
+            const stop5 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop5.setAttribute('offset', '100%');
+            stop5.setAttribute('style', 'stop-color:#ffd700');
+
+            gradient.appendChild(stop1);
+            gradient.appendChild(stop2);
+            gradient.appendChild(stop3);
+            gradient.appendChild(stop4);
+            gradient.appendChild(stop5);
+            defs.appendChild(gradient);
+            svg.appendChild(defs);
+
+            // Add area fill
+            const areaPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            areaPath.setAttribute('d', `${pathData} L 1000 300 L 0 300 Z`);
+            areaPath.setAttribute('fill', 'url(#lineGradient)');
+            areaPath.setAttribute('opacity', '0.2');
+            svg.appendChild(areaPath);
+
+            // Add temperature line
+            const linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            linePath.setAttribute('d', pathData);
+            linePath.setAttribute('stroke', 'url(#lineGradient)');
+            linePath.setAttribute('stroke-width', '3');
+            linePath.setAttribute('fill', 'none');
+            linePath.setAttribute('stroke-linecap', 'round');
+            linePath.setAttribute('stroke-linejoin', 'round');
+            svg.appendChild(linePath);
+
+            // Add data points
+            points.forEach((point, index) => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', point.x);
+                circle.setAttribute('cy', point.y);
+                
+                if (index === 7) {
+                    // Today's point
+                    circle.setAttribute('r', '8');
+                    circle.setAttribute('fill', '#e94560');
+                    circle.setAttribute('class', 'data-point current-point');
+                    
+                    // Add pulse ring
+                    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    ring.setAttribute('cx', point.x);
+                    ring.setAttribute('cy', point.y);
+                    ring.setAttribute('r', '12');
+                    ring.setAttribute('fill', '#e94560');
+                    ring.setAttribute('opacity', '0.3');
+                    ring.setAttribute('class', 'pulse-ring');
+                    svg.appendChild(ring);
+                } else if (index < 7) {
+                    // Past points
+                    circle.setAttribute('r', '5');
+                    circle.setAttribute('fill', '#6b7280');
+                    circle.setAttribute('class', 'data-point past-point');
+                } else {
+                    // Future points
+                    circle.setAttribute('r', '5');
+                    circle.setAttribute('fill', '#00d9ff');
+                    circle.setAttribute('class', 'data-point future-point');
+                }
+                
+                svg.appendChild(circle);
+            });
+
+            // Generate labels
+            labelsContainer.innerHTML = '';
+            
+            const dates = [
+                ...weatherData.historical.time.slice(-7),
+                ...weatherData.forecast.time.slice(0, 8)
+            ];
+
+            const weatherCodes = [
+                ...weatherData.historical.weather_code.slice(-7),
+                ...weatherData.forecast.weather_code.slice(0, 8)
+            ];
+
+            const precipProbs = [
+                ...(weatherData.historical.precipitation_probability_max?.slice(-7) || Array(7).fill(null)),
+                ...(weatherData.forecast.precipitation_probability_max?.slice(0, 8) || Array(8).fill(null))
+            ];
+
+            allTemps.forEach((temp, index) => {
+                const date = new Date(dates[index]);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const weather = getWeatherEmoji(weatherCodes[index]);
+                const precip = precipProbs[index];
+
+                const label = document.createElement('div');
+                label.className = 'day-label';
+                
+                if (index === 7) {
+                    label.classList.add('current-label');
+                } else if (index < 7) {
+                    label.classList.add('past-label');
+                } else {
+                    label.classList.add('future-label');
+                }
+
+                label.innerHTML = `
+                    <div class="label-temp">${Math.round(temp)}°F</div>
+                    <div class="label-day">${index === 7 ? '<strong>TODAY</strong>' : dayName}<br>${monthDay}</div>
+                    <div class="label-icon">${weather.emoji} ${precip ? precip + '%' : ''}</div>
+                `;
+                
+                labelsContainer.appendChild(label);
+            });
+
+            // Update last updated time
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 
+                `Last updated: ${now.toLocaleString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                })}`;
+        }
+
+        // Initialize map
         function initializeMap() {
             try {
-                // Create the map
-                const weatherMap = L.map('weatherMap').setView([38.6495, -90.3784], 10);
+                weatherMap = L.map('weatherMap').setView([LATITUDE, LONGITUDE], 10);
                 
-                // Add base map layer
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors',
                     maxZoom: 19
                 }).addTo(weatherMap);
                 
                 // Add precipitation layer from OpenWeatherMap
-                const apiKey = 'f9e35e302c3c0b1f7f3c3e3a3e3b3c3d'; // Demo key
+                const apiKey = 'f9e35e302c3c0b1f7f3c3e3a3e3b3c3d';
                 L.tileLayer(`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`, {
                     attribution: 'Weather data © OpenWeatherMap',
                     opacity: 0.6,
                     maxZoom: 19
                 }).addTo(weatherMap);
                 
-                // Add clouds layer
                 L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${apiKey}`, {
                     attribution: 'Weather data © OpenWeatherMap',
                     opacity: 0.4,
                     maxZoom: 19
                 }).addTo(weatherMap);
                 
-                // Add marker for Ladue
-                L.marker([38.6495, -90.3784])
+                L.marker([LATITUDE, LONGITUDE])
                     .addTo(weatherMap)
-                    .bindPopup('<b>📍 Ladue, MO</b><br>Current: 46.5°F<br>Condition: Rain')
+                    .bindPopup('<b>📍 Ladue, MO</b><br>Live Weather Data')
                     .openPopup();
                 
-                // Force map to resize properly
                 setTimeout(() => {
                     weatherMap.invalidateSize();
                 }, 100);
                 
             } catch (error) {
                 console.error('Error initializing map:', error);
-                document.getElementById('weatherMap').innerHTML = 
-                    '<div style="padding: 50px; text-align: center; color: #a8b2d1;">' +
-                    '<p style="font-size: 1.2em; margin-bottom: 10px;">⚠️ Weather Map</p>' +
-                    '<p>Interactive weather radar map with precipitation overlay</p>' +
-                    '<p style="margin-top: 20px; font-size: 0.9em;">Blue areas show precipitation zones</p>' +
-                    '</div>';
             }
         }
+
+        // Load everything on page load
+        window.addEventListener('load', () => {
+            fetchWeatherData();
+            setTimeout(initializeMap, 500);
+        });
+
+        // Auto-refresh every 30 minutes
+        setInterval(fetchWeatherData, 30 * 60 * 1000);
     </script>
 </body>
 </html>
